@@ -20,31 +20,26 @@ head(dat)
 summary(dat)
 
 #plot
+ggplot(dat, aes(length,"1", color = location)) + geom_point()
 ggplot(dat, aes(location,length, color = location)) + geom_point()
-ggplot(dat, aes(location,area, color = location)) + geom_point()
+ggplot(dat, aes(location, area, color = location)) + geom_point()
+
 
 # listwise deletion of missing 
 mydata <- na.omit(dat)
 head(mydata)
+df <- scale(mydata[3:9])
+head(df)
+wssplot(df) 
 
-data2 <- mydata[,-2]
-#data2 <- mydata[,1]
-head(data2)
-rownames(data2) <- data2[,1]
-princ <- prcomp(data2)
-
-mydata <- scale(mydata)
-
-
-# Determine number of clusters
-wss <- (nrow(dat)-1)*sum(apply(dat,2,var))
-for (i in 2:15) wss[i] <- sum(kmeans(mydata, 
-                                     centers=i)$withinss)
-plot(1:15, wss, type="b", xlab="Number of Clusters",
-     ylab="Within groups sum of squares")
-
-sCluster$cluster <- as.factor(sCluster$cluster)
-ggplot(dat, aes(location, length, color = sCluster$cluster)) + geom_point()
+# not working k-means
+wssplot <- function(data, nc=15, seed=1234){
+  wss <- (nrow(data[8])-1)*sum(apply(data,2,var))
+  for (i in 2:nc){
+    set.seed(seed)
+    wss[i] <- sum(kmeans(data, centers=i)$withinss)}
+  plot(1:nc, wss, type="b", xlab="Number of Clusters",
+       #ylab="Within groups sum of squares")}
 
 #write.csv(test, "../test.txt")
 #end here
