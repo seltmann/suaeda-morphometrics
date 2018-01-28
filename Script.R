@@ -6,11 +6,12 @@ library(grDevices)
 
 
 #set working directory
-#setwd("~/Documents/suaeda-morphometrics")
+setwd("~/Documents/suaeda-morphometrics")
 setwd("~/CCBER/Suaeda/suaeda-morphometrics")
 
 #read data into program
-dat <- read.csv("calyx_shape.csv",stringsAsFactors=TRUE, header=TRUE)
+dat <- read.csv("leaf_shape_2.csv",stringsAsFactors=TRUE, header=TRUE)
+dat <- read.csv("flower_shape.csv",stringsAsFactors=TRUE, header=TRUE)
 
 help("read.csv")
 
@@ -19,13 +20,18 @@ head(dat)
 summary(dat)
 
 ###############simple plot based on one variable and location##################
-#ggplot(dat, aes(lf_length,"1", color = location)) + geom_point()
-ggplot(dat, aes(location, ratio, color = location)) + geom_point()
-#ggplot(dat, aes(location, area, color = location)) + geom_point()
+ggplot(dat, aes(lf_length,"1", color = location)) + geom_point()
+ggplot(dat, aes(geo, ratio, color = location)) + geom_point()
+ggplot(dat, aes(location, lf_length, color = location)) + geom_point()
 
-#####ordering x axis terms#######
+
+#####ordering x axis terms based on label data from .csv#######
 dat$location <- as.character(dat$location)
 dat$location <- factor(dat$location, levels=unique(dat$location))
+
+####ordering x axis how ever you want####
+dat$location <- factor(dat$location, levels=c("SantaCruz", "SantaRosa", "SanIgnacio", "LasAnimas", "LasLisas", "SanCarlos", "LosAngeles", "SanFelipe"))
+
 
 ###########clustering########################
 #clustering ### the good test data
@@ -33,8 +39,8 @@ set.seed(32297)
 d <- data.frame(x=runif(100),y=runif(100))
 
 #clustering ### the real data
-x <- dat$area
-y <- dat$length
+x <- dat$geo
+y <- dat$ratio
 d <- data.frame(x,y)
 head(d)
 
