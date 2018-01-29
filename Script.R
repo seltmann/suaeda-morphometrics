@@ -7,7 +7,7 @@ library(grDevices)
 
 #set working directory
 setwd("~/Documents/suaeda-morphometrics")
-setwd("~/CCBER/Suaeda/suaeda-morphometrics")
+#setwd("~/CCBER/Suaeda/suaeda-morphometrics")
 
 #read data into program
 dat <- read.csv("leaf_shape.csv",stringsAsFactors=TRUE, header=TRUE)
