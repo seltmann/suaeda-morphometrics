@@ -3,6 +3,8 @@ library(vegan)
 library(ape)
 library(ggplot2)
 library(grDevices)
+library(cluster)
+require(graphics)
 
 
 #set working directory
@@ -10,7 +12,7 @@ setwd("~/Documents/suaeda-morphometrics")
 #setwd("~/CCBER/Suaeda/suaeda-morphometrics")
 
 #read data into program
-dat <- read.csv("leaf_shape.csv",stringsAsFactors=TRUE, header=TRUE)
+dat <- read.csv("combined.csv",stringsAsFactors=TRUE, header=TRUE)
 
 help("read.csv")
 
@@ -29,13 +31,15 @@ set.seed(32297)
 d <- data.frame(x=runif(100),y=runif(100))
 
 #clustering ### the real data
-x <- dat$area
-y <- dat$length
-d <- data.frame(x,y)
-head(d)
+x <- dat$flower_diameter
+y <- dat$flower_width
+z <- dat$location
+d <- data.frame(x,y,z)
+dclus <- d[1:2]
+head(dclus)
 
 #####k-means#####################################
-clus <- kmeans(d, centers=4)
+clus <- kmeans(dclus, centers=8)
 d$cluster <- clus$cluster
 
 help(kmeans)
@@ -53,17 +57,50 @@ ggplot() +
   theme(legend.position = "none")
 
 ############end k-means##########################
+
+
 ##############hierachical clustering###############
-vars.to.use <- colnames(dat)[3:8]
+##############start poster analysis here##########
+
+vars.to.use <- colnames(dat)[3:7]
 pmatrix <- scale(dat[,vars.to.use])
 pcenter <- attr(pmatrix, "scaled:center")
 pscale <- attr(pmatrix, "scaled:scale")
 
+#standard
 d <- dist(pmatrix, method="euclidean")
-pfit <- hclust(d, method="ward.D")
-plot(pfit, labels=dat$location, horiz=TRUE, cex=0.4)
+#"euclidean", "maximum", "manhattan", "#canberra", "binary" or "minkowski"
+
+#also did it with "average" and works as expected. Average is UPGMA
+pfit <- hclust(d, method="average")
+plot(pfit, labels=dat$location, cex=.8, hang = .1, xlab="", ylab="", main="UPGMA Flowers and leaf",axes = FALSE)
+rect.hclust(pfit, k = 3, border = "red")
+help(hclust)
+
+#########calculated cophenetic correlation
+cophenetic(pfit)
+
+#principal coordinate analysis 
+pcoa <- pcoa(d)
+head(pcoa)
+biplot(pcoa)
+help(pcoa)
+
+#matches citation of Rodrigues et. al., 2013. Gower is good for binary data, which you have none.
+e<- daisy(pmatrix,metric="gower")
+efit <- hclust(e, method="average")
+plot(efit, labels=dat$location, cex=.9, hang = .1, xlab="", ylab="", main="UPGMA Flowers and leaf",axes = FALSE)
+box()
+
+help(plot)
+
+par(mar=c(4.2, 4.2, 1.2, 1.2))
+
+#cleans graphical memory
+plot.new()
 
 help(hclust)
+help(daisy)
 
 
 
